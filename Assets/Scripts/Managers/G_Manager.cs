@@ -10,17 +10,27 @@ public class G_Manager : MonoBehaviour
     public UI_Manager uiManager;
     public P_Manager poolManager;
     public bool b_gameActive = false;
-    //[HideInInspector]
+    [HideInInspector]
     public List<Transform> l_players;
     [SerializeField]
     private float f_EnemiesFOV = 8.0f;
     [SerializeField]
     private GameObject go_menu, go_key, go_Environment;
+    [SerializeField]
+    private AudioSource a_source;
+    [SerializeField]
+    private AudioClip[] a_clip;
     private Transform t_NewTarget;
+    //[HideInInspector]
+    public int score = 0;
 
+    // Initialize variables and objects properties
     public void StartGame()
     {
+        score = 0;
+        uiManager.SetScore(score);
         go_key.SetActive(true);
+        uiManager.go_key.SetActive(false);
         b_gameActive = true;
         player.StartPlayer();
         for(int e = 0; e < l_players.Count; e++)
@@ -30,14 +40,12 @@ public class G_Manager : MonoBehaviour
         }
         foreach (Transform obj in go_Environment.transform)
         {
-            try
-            {
-                GetComponent<Sc_TEnDis>().OnStart();
-            }
-            catch { }
+            if(obj.GetComponent<Sc_TEnDis>() != null)
+                obj.GetComponent<Sc_TEnDis>().OnStart();
         }
     }
 
+    // Only Update for the game, checks the game status, important flags and behabiour
     private void Update()
     {
         if (b_gameActive)
@@ -52,6 +60,7 @@ public class G_Manager : MonoBehaviour
         }
     }
 
+    // Check all players position relative to other players, determine if must attack
     private void CheckTargets()
     {
         for (int p = 0; p < l_players.Count; p++)
@@ -80,12 +89,28 @@ public class G_Manager : MonoBehaviour
         }
     }
 
-    public void ShootTo(Transform origin)
+    // Item collection function
+    public void GotItem()
     {
-        if(b_gameActive)
-            poolManager.Shoot(origin);
+        a_source.PlayOneShot(a_clip[0]);
+        uiManager.go_key.SetActive(true);
     }
 
+    // Set the player score;
+    public void AddScore()
+    {
+        score += 1;
+        uiManager.SetScore(score);
+    }
+
+    // Bridge to the Shoot function and Pool Manager
+    public void ShootTo(Transform origin, Transform ownwer)
+    {
+        if(b_gameActive)
+            poolManager.Shoot(origin, ownwer);
+    }
+
+    // Exit game function
     public void QuitGame()
     {
         Application.Quit();

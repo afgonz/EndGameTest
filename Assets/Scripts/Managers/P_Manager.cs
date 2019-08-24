@@ -18,11 +18,13 @@ namespace Pool
         [SerializeField]
         private AudioClip[] au_clip;
 
+        // Initialize and clean all lists
         private void Start()
         {
             l_bullets = new List<GameObject> { };
         }
 
+        // Reuse an enemy from the pool or instantiate a new one
         public void NewEnemy()
         {
             GameObject newEnemy = null;
@@ -45,6 +47,7 @@ namespace Pool
             newEnemy.GetComponent<Enemy>().StartEnemy();
         }
 
+        // Reuse a bullet from the pool or instantiate a new one
         private GameObject NewBullet()
         {
             GameObject Bullet = null;
@@ -61,11 +64,13 @@ namespace Pool
             return Bullet;
         }
 
-        public void Shoot(Transform origin)
+        // Gives a position and direction to the bullet
+        public void Shoot(Transform origin, Transform owner)
         {
             GameObject Bullet = NewBullet();
             au_source.pitch = UnityEngine.Random.Range(1.5f, 2.0f);
             au_source.PlayOneShot(au_clip[0]);
+            Bullet.GetComponent<Bullet>().t_owner = owner;
             Bullet.transform.position = origin.position;
             Bullet.transform.rotation = origin.rotation;
             Bullet.SetActive(true);

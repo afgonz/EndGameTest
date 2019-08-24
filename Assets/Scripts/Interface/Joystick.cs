@@ -19,12 +19,14 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     public delegate void PushJS();
     public event PushJS OnPush, OnRelease;
 
+    // Reset the joysticks and determine the screen scale
     private void Start()
     {
         r_jsRect = i_jsBut.GetComponent<RectTransform>();
         v_screenSize = new Vector2(1920.0f / Screen.width, 1080.0f / Screen.height);
     }
 
+    // Change the joystick movement values
     public void OnDrag(PointerEventData eventData)
     {
         Vector3 inputJS = (eventData.position * v_screenSize - new Vector2(v_posCorrection.x, v_posCorrection.y)) / 150.0f;
@@ -32,6 +34,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         i_jsBut.rectTransform.localPosition = v_jsVect * 100.0f + new Vector3(i_jsBack.rectTransform.pivot.x == 0? 150 : -150, v_posCorrection.y / 2, 0.0f);
     }
 
+    // Event when the joystick is pressed
     public void OnPointerDown(PointerEventData eventData)
     {
         if(OnPush != null)
@@ -39,6 +42,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         OnDrag(eventData);
     }
 
+    // Event when the joystick is released
     public void OnPointerUp(PointerEventData eventData)
     {
         if(OnRelease != null)

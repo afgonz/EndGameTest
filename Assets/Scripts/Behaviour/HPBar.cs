@@ -13,6 +13,7 @@ public class HPBar : MonoBehaviour
     [SerializeField]
     private float f_HPValue = 1000.0f;
 
+    // Set or change the HP value and updates the UI
     public float SetHPValue { set { f_HPValue = value; UpdateValue(); } get { return f_HPValue; } }
     public float ChangeHPValue
     {

@@ -6,13 +6,17 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField]
-    private float f_speed = 0.1f, f_lifetime = 10.0f;    
+    private float f_speed = 0.1f, f_lifetime = 10.0f;
+    [HideInInspector]
+    public Transform t_owner;
 
+    // Initialize de bullet movement
     public void OnEnable()
     {
         StartCoroutine(MoveFwd());
     }
 
+    // Move the bullet for 10s
     private IEnumerator MoveFwd()
     {
         float f_life = 0;
@@ -25,6 +29,7 @@ public class Bullet : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+    // Disable the bullet if collides with an object
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player" || other.tag == "Wall")

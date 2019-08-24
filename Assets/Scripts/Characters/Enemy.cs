@@ -24,6 +24,7 @@ public class Enemy : MonoBehaviour
 
     public G_Manager SetManager { set { m_manager = value; } }
 
+    // Set the new AI target to move or attack
     public Transform SetTarget
     {
         get { return t_targetPos; }
@@ -36,15 +37,21 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    // Initialize the enemies properties
     public void StartEnemy()
     {
         p_system.Stop();
         b_firing = false;
+        StopAllCoroutines();
+        if (co_fire != null)
+            StopCoroutine(co_fire);
         if (t_targetPos == null)
             t_targetPos = new GameObject().transform;
         hpBar.SetHPValue = 1000.0f;
+        transform.position = new Vector3(UnityEngine.Random.Range(-11.5f, 11.5f), 0, UnityEngine.Random.Range(-8.0f, 5.0f));
     }
 
+    // Get a new target
     public void GetNewPos()
     {
         if (t_targetPos.tag == "Player")
@@ -53,6 +60,7 @@ public class Enemy : MonoBehaviour
         n_agent.SetDestination(t_targetPos.position);
     }
 
+    // Function to move the character and determine if must attack
     public void MoveEnemy()
     {
         if (hpBar.SetHPValue < 0)
@@ -72,6 +80,8 @@ public class Enemy : MonoBehaviour
             if (!b_firing)
             {
                 b_firing = true;
+                if (co_fire != null)
+                    StopCoroutine(co_fire);
                 StartCoroutine(ShootTime());
                 a_anim.SetBool("Shoot", true);
                 p_system.Play();
@@ -90,15 +100,17 @@ public class Enemy : MonoBehaviour
         t_HPBar.eulerAngles = new Vector3(60, -transform.rotation.y, 0);
     }
 
+    // Shooting function with firing speed
     private IEnumerator ShootTime()
     {
         while (b_firing)
         {
-            m_manager.ShootTo(t_FireOrigin);
+            m_manager.ShootTo(t_FireOrigin, transform);
             yield return new WaitForSeconds(1 / f_aspd);
         }
     }
 
+    // Check if the character is taking damage or colliding with some objec
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Bullet")
@@ -109,6 +121,9 @@ public class Enemy : MonoBehaviour
         {
             n_agent.ResetPath();
             n_agent.isStopped = true;
+            if (other.GetComponent<Bullet>() != null)
+                if (other.GetComponent<Bullet>().t_owner == m_manager.player.transform)
+                    m_manager.AddScore();
             gameObject.SetActive(false);
         }
     }
